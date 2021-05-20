@@ -744,13 +744,13 @@ SAML2_AUTH = {
         ],
     },
     'DEFAULT_NEXT_URL': '/',  # Custom target redirect URL after the user get logged in. Default to /admin if not set. This setting will be overwritten if you have parameter ?next= specificed in the login URL.
-    # Optional settings below
-    'NEW_USER_PROFILE': {
-        'USER_GROUPS': [],  # The default group name when a new user logs in
-        'ACTIVE_STATUS': True,  # The default active status for new users
-        'STAFF_STATUS': False,  # The staff status for new users
-        'SUPERUSER_STATUS': False,  # The superuser status for new users
-    },
+    # # Optional settings below
+    # 'NEW_USER_PROFILE': {
+    #     'USER_GROUPS': [],  # The default group name when a new user logs in
+    #     'ACTIVE_STATUS': True,  # The default active status for new users
+    #     'STAFF_STATUS': True,  # The staff status for new users
+    #     'SUPERUSER_STATUS': False,  # The superuser status for new users
+    # },
     # 'ATTRIBUTES_MAP': {  # Change Email/UserName/FirstName/LastName to corresponding SAML2 userprofile attributes.
     #     'email': 'Email',
     #     'username': 'UserName',

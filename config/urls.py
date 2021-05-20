@@ -18,15 +18,33 @@ def handler500(request, *args, **argv):
     return render(request, "500.html", {"sentry_event_id": last_event_id()}, status=500)
 
 
+urlpatterns = [
+    # These are the SAML2 related URLs. You can change "^saml2_auth/" regex to
+    # any path you want, like "^sso_auth/", "^sso_login/", etc. (required)
+    url(r'^saml2_auth/', include('django_saml2_auth.urls')),
+    # The following line will replace the default user login with SAML2 (optional)
+    # If you want to specific the after-login-redirect-URL, use parameter "?next=/the/path/you/want"
+    # with this view.
+    url(r'^sso/login/$', django_saml2_auth.views.signin),
+    # The following line will replace the admin login with SAML2 (optional)
+    # If you want to specific the after-login-redirect-URL, use parameter "?next=/the/path/you/want"
+    # with this view.
+    url(r'^sso/admin/login/$', django_saml2_auth.views.signin),
+    # The following line will replace the default user logout with the signout page (optional)
+    url(r'^sso/logout/$', django_saml2_auth.views.signout),
+    # The following line will replace the default admin user logout with the signout page (optional)
+    url(r'^sso/admin/logout/$', django_saml2_auth.views.signout),
+]
+
 # The functionality differs greatly depending on whether kiosk mode is enabled or not. However, the URL patterns
 # do not need to.
 if settings.KIOSK_MODE:
-    urlpatterns = [
+    urlpatterns += [
         url(r"^$", KioskHomeView.as_view(), name="kiosk-upload"),
         url(r"^real-home/$", ProjectRolesHomeView.as_view(), name="home"),
     ]
 else:
-    urlpatterns = [url(r"^$", ProjectRolesHomeView.as_view(), name="home")]
+    urlpatterns += [url(r"^$", ProjectRolesHomeView.as_view(), name="home")]
     HomeView = ProjectRolesHomeView
 
 urlpatterns += [
@@ -58,21 +76,6 @@ urlpatterns += [
     url(r"^cohorts/", include("cohorts.urls")),
     url(r"^clinvar-export/", include("clinvar_export.urls")),
     url(r"^beaconsite/", include("beaconsite.urls")),
-    # These are the SAML2 related URLs. You can change "^saml2_auth/" regex to
-    # any path you want, like "^sso_auth/", "^sso_login/", etc. (required)
-    url(r'^saml2_auth/', include('django_saml2_auth.urls')),
-    # The following line will replace the default user login with SAML2 (optional)
-    # If you want to specific the after-login-redirect-URL, use parameter "?next=/the/path/you/want"
-    # with this view.
-    url(r'^sso/login/$', django_saml2_auth.views.signin),
-    # The following line will replace the admin login with SAML2 (optional)
-    # If you want to specific the after-login-redirect-URL, use parameter "?next=/the/path/you/want"
-    # with this view.
-    url(r'^sso/admin/login/$', django_saml2_auth.views.signin),
-    # The following line will replace the default user logout with the signout page (optional)
-    url(r'^sso/logout/$', django_saml2_auth.views.signout),
-    # The following line will replace the default admin user logout with the signout page (optional)
-    url(r'^sso/admin/logout/$', django_saml2_auth.views.signout),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
