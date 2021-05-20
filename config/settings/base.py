@@ -82,6 +82,7 @@ THIRD_PARTY_APPS = [
     "encrypted_model_fields",
     "rest_framework_httpsignature",
     "webpack_loader",
+    "django_saml2_auth",
 ]
 
 # Apps specific for this project go here.
