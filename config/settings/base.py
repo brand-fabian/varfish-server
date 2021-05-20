@@ -681,7 +681,6 @@ if ENABLE_LDAP:
             )
         )
 
-
 # URL to redirect after the login.
 # Default: "/"
 DJANGO_SU_LOGIN_REDIRECT_URL = "/"
@@ -698,6 +697,73 @@ DJANGO_SU_LOGIN_CALLBACK = None
 # function so you can set session data, etc.
 # Default: None
 DJANGO_SU_CUSTOM_LOGIN_ACTION = None
+
+
+# SAML configuration
+# ------------------------------------------------------------------------------
+
+
+ENABLE_SAML = env.bool('ENABLE_SAML', False)
+SAML2_AUTH = {
+    # Required setting
+    'SAML_CLIENT_SETTINGS': {  # Pysaml2 Saml client settings (https://pysaml2.readthedocs.io/en/latest/howto/config.html)
+        'entityid': env.str(
+            'SAML_CLIENT_ENTITY_ID', 'SODARcore'
+        ),  # The optional entity ID string to be passed in the 'Issuer' element of authn request, if required by the IDP.
+        'entitybaseurl': env.str(
+            'SAML_CLIENT_ENTITY_URL', 'https://localhost:8000'
+        ),
+        'metadata': {
+            'local': [
+                env.str(
+                    'SAML_CLIENT_METADATA_FILE', 'metadata.xml'
+                ),  # The auto(dynamic) metadata configuration URL of SAML2
+            ],
+        },
+        "service": {
+            'sp': {
+                'idp': env.str(
+                    'SAML_CLIENT_IPD',
+                    'https://sso.hpc.bihealth.org/auth/realms/cubi',
+                ),
+                # Keycloak expects client signature
+                'authn_requests_signed': 'true',
+                # Enforce POST binding which is required by keycloak
+                'binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+            },
+        },
+        'key_file': env.str('SAML_CLIENT_KEY_FILE', 'key.pem'),
+        'cert_file': env.str('SAML_CLIENT_CERT_FILE', 'cert.pem'),
+        'xmlsec_binary': env.str('SAML_CLIENT_XMLSEC1', '/usr/bin/xmlsec1'),
+        'encryption_keypairs': [
+            {
+                'key_file': env.str('SAML_CLIENT_KEY_FILE', 'key.pem'),
+                'cert_file': env.str('SAML_CLIENT_CERT_FILE', 'cert.pem'),
+            }
+        ],
+    },
+    'DEFAULT_NEXT_URL': '/',  # Custom target redirect URL after the user get logged in. Default to /admin if not set. This setting will be overwritten if you have parameter ?next= specificed in the login URL.
+    # Optional settings below
+    'NEW_USER_PROFILE': {
+        'USER_GROUPS': [],  # The default group name when a new user logs in
+        'ACTIVE_STATUS': True,  # The default active status for new users
+        'STAFF_STATUS': False,  # The staff status for new users
+        'SUPERUSER_STATUS': False,  # The superuser status for new users
+    },
+    # 'ATTRIBUTES_MAP': {  # Change Email/UserName/FirstName/LastName to corresponding SAML2 userprofile attributes.
+    #     'email': 'Email',
+    #     'username': 'UserName',
+    #     'first_name': 'FirstName',
+    #     'last_name': 'LastName',
+    # },
+    # 'TRIGGER': {
+    #     'FIND_USER': 'path.to.your.find.user.hook.method',
+    #     'NEW_USER': 'path.to.your.new.user.hook.method',
+    #     'CREATE_USER': 'path.to.your.create.user.hook.method',
+    #     'BEFORE_LOGIN': 'path.to.your.login.hook.method',
+    # },
+    # 'ASSERTION_URL': 'https://your.url.here',  # Custom URL to validate incoming SAML requests against
+}
 
 
 # STORAGE CONFIGURATION
